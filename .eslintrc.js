@@ -3,7 +3,7 @@ module.exports = {
         "node": true
     },
     "globals": {
-      "Uint8Array": false
+        "Uint8Array": false
     },
     "extends": "eslint:recommended",
     "rules": {
@@ -64,10 +64,7 @@ module.exports = {
         "key-spacing": "off",
         "keyword-spacing": "off",
         "line-comment-position": "off",
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
+
         "lines-around-comment": "off",
         "lines-around-directive": "off",
         "max-depth": "off",
