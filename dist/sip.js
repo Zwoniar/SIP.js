@@ -207,7 +207,7 @@ module.exports = function (environment) {
 /* 2 */
 /***/ (function(module) {
 
-module.exports = {"name":"sip.js","title":"SIP.js","description":"A simple, intuitive, and powerful JavaScript signaling library","version":"0.11.2","main":"dist/sip.min.js","browser":{"./src/environment.js":"./src/environment_browser.js"},"homepage":"https://sipjs.com","author":"OnSIP <developer@onsip.com> (https://sipjs.com/aboutus/)","contributors":[{"url":"https://github.com/onsip/SIP.js/blob/master/THANKS.md"}],"repository":{"type":"git","url":"https://github.com/onsip/SIP.js.git"},"keywords":["sip","websocket","webrtc","library","javascript"],"devDependencies":{"babel-core":"^6.26.0","babel-loader":"^7.1.2","babel-preset-env":"^1.6.1","eslint":"^4.9.0","jasmine":"^3.1.0","karma":"^2.0.2","karma-cli":"^1.0.1","karma-jasmine":"^1.1.0","karma-jasmine-html-reporter":"^1.1.0","karma-mocha-reporter":"^2.2.5","karma-phantomjs-launcher":"^1.0.4","karma-webpack":"^3.0.0","pegjs":"^0.10.0","pegjs-loader":"^0.5.4","phantomjs-polyfill-object-assign":"0.0.2","uglifyjs-webpack-plugin":"^1.2.5","webpack":"^4.8.3","webpack-cli":"^2.1.3"},"engines":{"node":">=6.0"},"license":"MIT","scripts":{"prebuild":"eslint src/*.js src/**/*.js","build-dev":"webpack --progress --env.buildType dev","build-prod":"webpack --progress --env.buildType prod","copy-dist-files":"cp dist/sip.js dist/sip-$npm_package_version.js && cp dist/sip.min.js  dist/sip-$npm_package_version.min.js","build":"npm run build-dev && npm run build-prod && npm run copy-dist-files","browserTest":"sleep 2 && open http://0.0.0.0:9876/debug.html & karma start --reporters kjhtml --no-single-run","commandLineTest":"karma start --reporters mocha --browsers PhantomJS --single-run","buildAndTest":"npm run build && npm run commandLineTest","buildAndBrowserTest":"npm run build && npm run browserTest"},"dependencies":{"crypto-js":"^3.1.9-1"},"optionalDependencies":{"promiscuous":"^0.6.0"}};
+module.exports = {"name":"sip.js","title":"SIP.js","description":"A simple, intuitive, and powerful JavaScript signaling library","version":"0.11.2","main":"dist/sip.min.js","browser":{"./src/environment.js":"./src/environment_browser.js"},"homepage":"https://sipjs.com","author":"OnSIP <developer@onsip.com> (https://sipjs.com/aboutus/)","contributors":[{"url":"https://github.com/onsip/SIP.js/blob/master/THANKS.md"}],"repository":{"type":"git","url":"https://github.com/onsip/SIP.js.git"},"keywords":["sip","websocket","webrtc","library","javascript"],"devDependencies":{"babel-core":"^6.26.0","babel-loader":"^7.1.2","babel-preset-env":"^1.6.1","eslint":"^4.9.0","jasmine":"^3.1.0","karma":"^2.0.2","karma-cli":"^1.0.1","karma-jasmine":"^1.1.0","karma-jasmine-html-reporter":"^1.1.0","karma-mocha-reporter":"^2.2.5","karma-phantomjs-launcher":"^1.0.4","karma-webpack":"^3.0.0","pegjs":"^0.10.0","pegjs-loader":"^0.5.4","phantomjs-polyfill-object-assign":"0.0.2","uglifyjs-webpack-plugin":"^1.2.5","webpack":"^4.8.3","webpack-cli":"^2.1.3"},"engines":{"node":">=6.0"},"license":"MIT","scripts":{"prebuild":"eslint src/*.js src/**/*.js","build-dev":"webpack --progress --env.buildType dev","build-prod":"webpack --progress --env.buildType prod","build":"npm run build-dev && npm run build-prod","browserTest":"sleep 2 && open http://0.0.0.0:9876/debug.html & karma start --reporters kjhtml --no-single-run","commandLineTest":"karma start --reporters mocha --browsers PhantomJS --single-run","buildAndTest":"npm run build && npm run commandLineTest","buildAndBrowserTest":"npm run build && npm run browserTest"},"dependencies":{"crypto-js":"^3.1.9-1"},"optionalDependencies":{"promiscuous":"^0.6.0"}};
 
 /***/ }),
 /* 3 */
@@ -5321,7 +5321,8 @@ module.exports = function (SIP) {
   };
 
   InviteServerContext.prototype = Object.create({}, {
-    reject: { writable: true, value: function value(options) {
+    reject: {
+      writable: true, value: function value(options) {
         // Check Session Status
         if (this.status === C.STATUS_TERMINATED) {
           throw new SIP.Exceptions.InvalidStateError(this.status);
@@ -5331,9 +5332,11 @@ module.exports = function (SIP) {
 
         SIP.ServerContext.prototype.reject.call(this, options);
         return this.terminated();
-      } },
+      }
+    },
 
-    terminate: { writable: true, value: function value(options) {
+    terminate: {
+      writable: true, value: function value(options) {
         options = options || {};
 
         var extraHeaders = (options.extraHeaders || []).slice(),
@@ -5397,12 +5400,14 @@ module.exports = function (SIP) {
         }
 
         return this;
-      } },
+      }
+    },
 
     /*
      * @param {Object} [options.sessionDescriptionHandlerOptions] gets passed to SIP.SessionDescriptionHandler.getDescription as options
      */
-    progress: { writable: true, value: function value(options) {
+    progress: {
+      writable: true, value: function value(options) {
         options = options || {};
         var statusCode = options.statusCode || 180,
             reasonPhrase = options.reasonPhrase,
@@ -5491,12 +5496,14 @@ module.exports = function (SIP) {
           normalReply.apply(this);
         }
         return this;
-      } },
+      }
+    },
 
     /*
      * @param {Object} [options.sessionDescriptionHandlerOptions] gets passed to SIP.SessionDescriptionHandler.getDescription as options
      */
-    accept: { writable: true, value: function value(options) {
+    accept: {
+      writable: true, value: function value(options) {
         options = options || {};
 
         this.onInfo = options.onInfo;
@@ -5585,9 +5592,11 @@ module.exports = function (SIP) {
         }
 
         return this;
-      } },
+      }
+    },
 
-    receiveRequest: { writable: true, value: function value(request) {
+    receiveRequest: {
+      writable: true, value: function value(request) {
 
         // ISC RECEIVE REQUEST
 
@@ -5706,30 +5715,37 @@ module.exports = function (SIP) {
             Session.prototype.receiveRequest.apply(this, [request]);
             break;
         }
-      } },
+      }
+    },
 
     // Internal Function to setup the handler consistently
-    setupSessionDescriptionHandler: { writable: true, value: function value() {
+    setupSessionDescriptionHandler: {
+      writable: true, value: function value() {
         if (this.sessionDescriptionHandler) {
           return this.sessionDescriptionHandler;
         }
         return this.sessionDescriptionHandlerFactory(this, this.ua.configuration.sessionDescriptionHandlerFactoryOptions);
-      } },
+      }
+    },
 
-    onTransportError: { writable: true, value: function value() {
+    onTransportError: {
+      writable: true, value: function value() {
         if (this.status !== C.STATUS_CONFIRMED && this.status !== C.STATUS_TERMINATED) {
           this.failed(null, SIP.C.causes.CONNECTION_ERROR);
         }
-      } },
+      }
+    },
 
-    onRequestTimeout: { writable: true, value: function value() {
+    onRequestTimeout: {
+      writable: true, value: function value() {
         if (this.status === C.STATUS_CONFIRMED) {
           this.terminated(null, SIP.C.causes.REQUEST_TIMEOUT);
         } else if (this.status !== C.STATUS_TERMINATED) {
           this.failed(null, SIP.C.causes.REQUEST_TIMEOUT);
           this.terminated(null, SIP.C.causes.REQUEST_TIMEOUT);
         }
-      } }
+      }
+    }
 
   });
 
@@ -5821,7 +5837,8 @@ module.exports = function (SIP) {
   };
 
   InviteClientContext.prototype = Object.create({}, {
-    invite: { writable: true, value: function value() {
+    invite: {
+      writable: true, value: function value() {
         var self = this;
 
         //Save the session into the ua sessions collection.
@@ -5837,7 +5854,9 @@ module.exports = function (SIP) {
             this.send();
           } else {
             //Initialize Media Session
-            this.sessionDescriptionHandler = this.sessionDescriptionHandlerFactory(this, this.sessionDescriptionHandlerFactoryOptions);
+            if (!this.sessionDescriptionHandler) {
+              this.sessionDescriptionHandler = this.sessionDescriptionHandlerFactory(this, this.sessionDescriptionHandlerFactoryOptions);
+            }
             this.emit('SessionDescriptionHandler-created', this.sessionDescriptionHandler);
 
             this.sessionDescriptionHandler.getDescription(this.sessionDescriptionHandlerOptions, this.modifiers).then(function onSuccess(description) {
@@ -5858,9 +5877,11 @@ module.exports = function (SIP) {
           }
         }.bind(this));
         return this;
-      } },
+      }
+    },
 
-    receiveInviteResponse: { writable: true, value: function value(response) {
+    receiveInviteResponse: {
+      writable: true, value: function value(response) {
         var cause,
             session = this,
             id = response.call_id + response.from_tag + response.to_tag,
@@ -6041,7 +6062,20 @@ module.exports = function (SIP) {
                 });
               }
             } else {
-              this.emit('progress', response);
+              // Early media
+              if (this.ua.configuration.allowEarlyMedia && this.hasOffer && response.status_code === 183) {
+                this.hasAnswer = false;
+                this.sessionDescriptionHandler.setDescription(response.body, this.sessionDescriptionHandlerOptions, this.modifiers).then(function onSuccess() {
+                  session.status = C.STATUS_EARLY_MEDIA;
+                  session.emit('progress', response);
+                }, function onFailure(e) {
+                  session.logger.warn(e);
+                  session.acceptAndTerminate(response, 488, 'Not Acceptable Here');
+                  session.failed(response, SIP.C.causes.BAD_MEDIA_DESCRIPTION);
+                });
+              } else {
+                this.emit('progress', response);
+              }
             }
             break;
           case /^2[0-9]{2}$/.test(response.status_code):
@@ -6161,9 +6195,11 @@ module.exports = function (SIP) {
             this.failed(response, cause);
             this.terminated(response, cause);
         }
-      } },
+      }
+    },
 
-    cancel: { writable: true, value: function value(options) {
+    cancel: {
+      writable: true, value: function value(options) {
         options = options || {};
 
         options.extraHeaders = (options.extraHeaders || []).slice();
@@ -6186,9 +6222,11 @@ module.exports = function (SIP) {
         }
 
         return this.canceled();
-      } },
+      }
+    },
 
-    terminate: { writable: true, value: function value(options) {
+    terminate: {
+      writable: true, value: function value(options) {
         if (this.status === C.STATUS_TERMINATED) {
           return this;
         }
@@ -6200,9 +6238,11 @@ module.exports = function (SIP) {
         }
 
         return this;
-      } },
+      }
+    },
 
-    receiveRequest: { writable: true, value: function value(request) {
+    receiveRequest: {
+      writable: true, value: function value(request) {
         // ICC RECEIVE REQUEST
 
         // Reject CANCELs
@@ -6220,22 +6260,27 @@ module.exports = function (SIP) {
         }
 
         return Session.prototype.receiveRequest.apply(this, [request]);
-      } },
+      }
+    },
 
-    onTransportError: { writable: true, value: function value() {
+    onTransportError: {
+      writable: true, value: function value() {
         if (this.status !== C.STATUS_CONFIRMED && this.status !== C.STATUS_TERMINATED) {
           this.failed(null, SIP.C.causes.CONNECTION_ERROR);
         }
-      } },
+      }
+    },
 
-    onRequestTimeout: { writable: true, value: function value() {
+    onRequestTimeout: {
+      writable: true, value: function value() {
         if (this.status === C.STATUS_CONFIRMED) {
           this.terminated(null, SIP.C.causes.REQUEST_TIMEOUT);
         } else if (this.status !== C.STATUS_TERMINATED) {
           this.failed(null, SIP.C.causes.REQUEST_TIMEOUT);
           this.terminated(null, SIP.C.causes.REQUEST_TIMEOUT);
         }
-      } }
+      }
+    }
 
   });
 
@@ -6289,7 +6334,8 @@ module.exports = function (SIP) {
 
   ReferClientContext.prototype = Object.create({}, {
 
-    refer: { writable: true, value: function value(options) {
+    refer: {
+      writable: true, value: function value(options) {
         options = options || {};
 
         var extraHeaders = (this.extraHeaders || []).slice();
@@ -6313,9 +6359,11 @@ module.exports = function (SIP) {
           }.bind(this)
         });
         return this;
-      } },
+      }
+    },
 
-    receiveNotify: { writable: true, value: function value(request) {
+    receiveNotify: {
+      writable: true, value: function value(request) {
         // If we can correctly handle this, then we need to send a 200 OK!
         if (request.hasHeader('Content-Type') && request.getHeader('Content-Type').search(/^message\/sipfrag/) !== -1) {
           var messageBody = SIP.Grammar.parse(request.body, 'sipfrag');
@@ -6342,7 +6390,8 @@ module.exports = function (SIP) {
           return;
         }
         request.reply(489, 'Bad Event');
-      } }
+      }
+    }
   });
 
   SIP.ReferClientContext = ReferClientContext;
@@ -6401,14 +6450,17 @@ module.exports = function (SIP) {
 
   ReferServerContext.prototype = Object.create({}, {
 
-    progress: { writable: true, value: function value() {
+    progress: {
+      writable: true, value: function value() {
         if (this.status !== C.STATUS_WAITING_FOR_ANSWER) {
           throw new SIP.Exceptions.InvalidStateError(this.status);
         }
         this.request.reply(100);
-      } },
+      }
+    },
 
-    reject: { writable: true, value: function value(options) {
+    reject: {
+      writable: true, value: function value(options) {
         if (this.status === C.STATUS_TERMINATED) {
           throw new SIP.Exceptions.InvalidStateError(this.status);
         }
@@ -6416,9 +6468,11 @@ module.exports = function (SIP) {
         this.status = C.STATUS_TERMINATED;
         SIP.ServerContext.prototype.reject.call(this, options);
         this.emit('referRequestRejected', this);
-      } },
+      }
+    },
 
-    accept: { writable: true, value: function value(options, modifiers) {
+    accept: {
+      writable: true, value: function value(options, modifiers) {
         options = options || {};
 
         if (this.status === C.STATUS_WAITING_FOR_ANSWER) {
@@ -6504,9 +6558,11 @@ module.exports = function (SIP) {
             this.referredSession.emit('referAccepted', this);
           }
         }
-      } },
+      }
+    },
 
-    sendNotify: { writable: true, value: function value(body) {
+    sendNotify: {
+      writable: true, value: function value(body) {
         if (this.status !== C.STATUS_ANSWERED) {
           throw new SIP.Exceptions.InvalidStateError(this.status);
         }
@@ -6536,7 +6592,8 @@ module.exports = function (SIP) {
             return;
           }
         }, this.ua).send();
-      } }
+      }
+    }
   });
 
   SIP.ReferServerContext = ReferServerContext;
@@ -8228,7 +8285,9 @@ module.exports = function (SIP, environment) {
 
       allowLegacyNotifications: false,
 
-      allowOutOfDialogRefers: false
+      allowOutOfDialogRefers: false,
+
+      allowEarlyMedia: false
     };
 
     // Pre-Configuration
@@ -8647,6 +8706,11 @@ module.exports = function (SIP, environment) {
         contactName: function contactName(_contactName) {
           if (typeof _contactName === 'string') {
             return _contactName;
+          }
+        },
+        allowEarlyMedia: function allowEarlyMedia(_allowEarlyMedia) {
+          if (typeof _allowEarlyMedia === 'boolean') {
+            return _allowEarlyMedia;
           }
         }
       }

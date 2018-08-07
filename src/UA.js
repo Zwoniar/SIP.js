@@ -865,6 +865,8 @@ module.exports = function (SIP, environment) {
         allowLegacyNotifications: false,
 
         allowOutOfDialogRefers: false,
+
+        allowEarlyMedia: false
       };
 
     // Pre-Configuration
@@ -1284,6 +1286,11 @@ module.exports = function (SIP, environment) {
             return contactName;
           }
         },
+        allowEarlyMedia: function (allowEarlyMedia) {
+          if (typeof allowEarlyMedia === 'boolean') {
+            return allowEarlyMedia;
+          }
+        }
       }
     };
   };
