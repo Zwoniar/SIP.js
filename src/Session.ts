@@ -1825,7 +1825,37 @@ export class InviteClientContext extends Session implements ClientContext {
             }
           }
         } else {
-          this.emit("progress", response);
+          if (this.ua.configuration.allowEarlyMedia && this.hasOffer && response.statusCode === 183) {
+            if (!this.createDialog(response, "UAC")) {
+              break;
+            }
+            this.hasAnswer = true;
+            const sessionando = this;
+            this.earlyDialogs[id].sessionDescriptionHandler.setDescription(response.body,
+              this.sessionDescriptionHandlerOptions, this.modifiers)
+              .then(
+                function onSuccess() {
+                  extraHeaders.push(
+                    "RAck: " + response.getHeader("rseq") + " " + response.getHeader("cseq")
+                  );
+
+                  sessionando.sendRequest(C.PRACK, {
+                    extraHeaders,
+                    // tslint:disable-next-line:no-empty
+                    receiveResponse: () => { }
+                  });
+                  sessionando.status = SessionStatus.STATUS_EARLY_MEDIA;
+                  sessionando.emit("progress", response);
+                },
+                function onFailure(e) {
+                  sessionando.logger.warn(e);
+                  sessionando.acceptAndTerminate(response, 488, "Not Acceptable Here");
+                  sessionando.failed(response, C.causes.BAD_MEDIA_DESCRIPTION);
+                }
+              );
+          } else {
+            this.emit("progress", response);
+          }
         }
         break;
       case /^2[0-9]{2}$/.test(codeString):

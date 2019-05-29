@@ -47,6 +47,7 @@ const environment = (global as any).window || global;
 export namespace UA {
   export interface Options {
     uri?: string | URI;
+    allowEarlyMedia?: boolean,
     allowLegacyNotifications?: boolean;
     allowOutOfDialogRefers?: boolean;
     authenticationFactory?: (ua: UA) => DigestAuthentication | any; // any for custom ones
@@ -1235,9 +1236,11 @@ export class UA extends EventEmitter {
       allowLegacyNotifications: false,
 
       allowOutOfDialogRefers: false,
+
+      allowEarlyMedia: false
     };
 
-    const configCheck: {mandatory: {[name: string]: any}, optional: {[name: string]: any}} =
+    const configCheck: { mandatory: { [name: string]: any }, optional: { [name: string]: any } } =
       this.getConfigurationCheck();
 
     // Check Mandatory parameters
@@ -1592,6 +1595,12 @@ export class UA extends EventEmitter {
             return contactName;
           }
         },
+
+        allowEarlyMedia: (allowEarlyMedia: boolean): boolean | undefined => {
+          if (typeof allowEarlyMedia === "boolean") {
+            return allowEarlyMedia;
+          }
+        }
       }
     };
   }
