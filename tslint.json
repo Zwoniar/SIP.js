@@ -1,6 +1,5 @@
 {
   "defaultSeverity": "error",
-  "extends": "tslint:recommended",
   "linterOptions": {
     "exclude": [
       "package.json"
