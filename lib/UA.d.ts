@@ -18,6 +18,7 @@ import { URI } from "./URI";
 export declare namespace UA {
     interface Options {
         uri?: string | URI;
+        allowEarlyMedia?: boolean;
         allowLegacyNotifications?: boolean;
         allowOutOfDialogRefers?: boolean;
         authenticationFactory?: (ua: UA) => DigestAuthentication | any;

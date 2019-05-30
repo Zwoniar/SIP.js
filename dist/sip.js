@@ -981,7 +981,7 @@ var C;
 /* 4 */
 /***/ (function(module) {
 
-module.exports = {"name":"sip.js","title":"SIP.js","description":"A simple, intuitive, and powerful JavaScript signaling library","version":"0.13.8","license":"MIT","main":"./lib/index.js","types":"./lib/index.d.ts","homepage":"https://sipjs.com","author":"OnSIP <developer@onsip.com> (https://sipjs.com/aboutus/)","contributors":[{"url":"https://github.com/onsip/SIP.js/blob/master/THANKS.md"}],"repository":{"type":"git","url":"https://github.com/onsip/SIP.js.git"},"keywords":["sip","webrtc","library","websocket","javascript","typescript"],"dependencies":{"crypto-js":"^3.1.9-1"},"devDependencies":{"@types/jasmine":"^3.3.11","@types/node":"^11.11.6","circular-dependency-plugin":"^5.0.2","jasmine-core":"^3.3.0","karma":"^4.0.1","karma-chrome-launcher":"^2.2.0","karma-cli":"^2.0.0","karma-jasmine":"^2.0.1","karma-jasmine-html-reporter":"^1.4.0","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.5","pegjs":"^0.10.0","ts-loader":"^5.3.3","ts-pegjs":"0.2.2","tslint":"^5.14.0","typescript":"^3.3.4000","webpack":"^4.29.6","webpack-cli":"^3.3.0"},"engines":{"node":">=8.0"},"scripts":{"prebuild":"tslint -p tsconfig-base.json -c tslint.json","generate-grammar":"node build/grammarGenerator.js","build-reg-bundle":"webpack --progress --config build/webpack.config.js --env.buildType reg","build-min-bundle":"webpack --progress --config build/webpack.config.js --env.buildType min","build-bundles":"npm run build-reg-bundle && npm run build-min-bundle","build-lib":"tsc -p src","build-test":"tsc -p test","copy-dist-files":"cp dist/sip.js dist/sip-$npm_package_version.js && cp dist/sip.min.js dist/sip-$npm_package_version.min.js","build":"npm run generate-grammar && npm run build-lib && npm run build-reg-bundle && npm run build-min-bundle && npm run copy-dist-files","browserTest":"npm run build-test && sleep 2 && open http://0.0.0.0:9876/debug.html & karma start --reporters kjhtml --no-single-run","commandLineTest":"npm run build-test && karma start --reporters mocha --browsers ChromeHeadless --single-run","buildAndTest":"npm run build && npm run commandLineTest","buildAndBrowserTest":"npm run build && npm run browserTest"}};
+module.exports = {"name":"sip.js","title":"SIP.js","description":"A simple, intuitive, and powerful JavaScript signaling library","version":"0.13.8","license":"MIT","main":"lib/index.js","homepage":"https://sipjs.com","author":"OnSIP <developer@onsip.com> (https://sipjs.com/aboutus/)","contributors":[{"url":"https://github.com/onsip/SIP.js/blob/master/THANKS.md"}],"repository":{"type":"git","url":"https://github.com/onsip/SIP.js.git"},"keywords":["sip","webrtc","library","websocket","javascript","typescript"],"dependencies":{"crypto-js":"^3.1.9-1"},"devDependencies":{"@types/jasmine":"^3.3.11","@types/node":"^11.11.6","circular-dependency-plugin":"^5.0.2","jasmine-core":"^3.3.0","karma":"^4.0.1","karma-chrome-launcher":"^2.2.0","karma-cli":"^2.0.0","karma-jasmine":"^2.0.1","karma-jasmine-html-reporter":"^1.4.0","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.5","pegjs":"^0.10.0","ts-loader":"^5.3.3","ts-pegjs":"0.2.2","tslint":"^5.14.0","typescript":"^3.3.4000","webpack":"^4.29.6","webpack-cli":"^3.3.0"},"engines":{"node":">=8.0"},"scripts":{"prebuild":"tslint -p tsconfig-base.json -c tslint.json","generate-grammar":"node build/grammarGenerator.js","build-reg-bundle":"webpack --progress --config build/webpack.config.js --env.buildType reg","build-min-bundle":"webpack --progress --config build/webpack.config.js --env.buildType min","build-bundles":"npm run build-reg-bundle && npm run build-min-bundle","build-lib":"tsc -p src","build-test":"tsc -p test","copy-dist-files":"copy dist\\sip.js dist\\sip-$npm_package_version.js && copy dist\\sip.min.js dist\\sip-$npm_package_version.min.js","build":"npm run generate-grammar && npm run build-lib && npm run build-reg-bundle && npm run build-min-bundle && npm run copy-dist-files","browserTest":"npm run build-test && sleep 2 && open http://0.0.0.0:9876/debug.html & karma start --reporters kjhtml --no-single-run","commandLineTest":"npm run build-test && karma start --reporters mocha --browsers ChromeHeadless --single-run","buildAndTest":"npm run build && npm run commandLineTest","buildAndBrowserTest":"npm run build && npm run browserTest"},"types":"./types"};
 
 /***/ }),
 /* 5 */
@@ -22982,7 +22982,34 @@ var InviteClientContext = /** @class */ (function (_super) {
                     }
                 }
                 else {
-                    this.emit("progress", response);
+                    if (this.ua.configuration.allowEarlyMedia && this.hasOffer && response.statusCode === 183) {
+                        if (!this.createDialog(response, "UAC")) {
+                            break;
+                        }
+                        this.hasAnswer = true;
+                        var session_1 = this;
+                        if (!this.sessionDescriptionHandler) {
+                            this.sessionDescriptionHandler = this.sessionDescriptionHandlerFactory(this, this.ua.configuration.sessionDescriptionHandlerFactoryOptions || {});
+                        }
+                        this.sessionDescriptionHandler.setDescription(response.body, this.sessionDescriptionHandlerOptions, this.modifiers)
+                            .then(function onSuccess() {
+                            extraHeaders.push("RAck: " + response.getHeader("rseq") + " " + response.getHeader("cseq"));
+                            session_1.sendRequest(Constants_1.C.PRACK, {
+                                extraHeaders: extraHeaders,
+                                // tslint:disable-next-line:no-empty
+                                receiveResponse: function () { }
+                            });
+                            session_1.status = Enums_1.SessionStatus.STATUS_EARLY_MEDIA;
+                            session_1.emit("progress", response);
+                        }, function onFailure(e) {
+                            session_1.logger.warn(e);
+                            session_1.acceptAndTerminate(response, 488, "Not Acceptable Here");
+                            session_1.failed(response, Constants_1.C.causes.BAD_MEDIA_DESCRIPTION);
+                        });
+                    }
+                    else {
+                        this.emit("progress", response);
+                    }
                 }
                 break;
             case /^2[0-9]{2}$/.test(codeString):
@@ -25091,6 +25118,7 @@ var UA = /** @class */ (function (_super) {
             }),
             allowLegacyNotifications: false,
             allowOutOfDialogRefers: false,
+            allowEarlyMedia: false
         };
         var configCheck = this.getConfigurationCheck();
         // Check Mandatory parameters
@@ -25404,6 +25432,11 @@ var UA = /** @class */ (function (_super) {
                         return contactName;
                     }
                 },
+                allowEarlyMedia: function (allowEarlyMedia) {
+                    if (typeof allowEarlyMedia === "boolean") {
+                        return allowEarlyMedia;
+                    }
+                }
             }
         };
     };

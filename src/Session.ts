@@ -1830,8 +1830,14 @@ export class InviteClientContext extends Session implements ClientContext {
               break;
             }
             this.hasAnswer = true;
-            const sessionando = this;
-            this.earlyDialogs[id].sessionDescriptionHandler.setDescription(response.body,
+            const session = this;
+            if (!this.sessionDescriptionHandler) {
+              this.sessionDescriptionHandler = this.sessionDescriptionHandlerFactory(
+                this,
+                this.ua.configuration.sessionDescriptionHandlerFactoryOptions || {}
+              );
+            }
+            this.sessionDescriptionHandler.setDescription(response.body,
               this.sessionDescriptionHandlerOptions, this.modifiers)
               .then(
                 function onSuccess() {
@@ -1839,18 +1845,18 @@ export class InviteClientContext extends Session implements ClientContext {
                     "RAck: " + response.getHeader("rseq") + " " + response.getHeader("cseq")
                   );
 
-                  sessionando.sendRequest(C.PRACK, {
+                  session.sendRequest(C.PRACK, {
                     extraHeaders,
                     // tslint:disable-next-line:no-empty
                     receiveResponse: () => { }
                   });
-                  sessionando.status = SessionStatus.STATUS_EARLY_MEDIA;
-                  sessionando.emit("progress", response);
+                  session.status = SessionStatus.STATUS_EARLY_MEDIA;
+                  session.emit("progress", response);
                 },
                 function onFailure(e) {
-                  sessionando.logger.warn(e);
-                  sessionando.acceptAndTerminate(response, 488, "Not Acceptable Here");
-                  sessionando.failed(response, C.causes.BAD_MEDIA_DESCRIPTION);
+                  session.logger.warn(e);
+                  session.acceptAndTerminate(response, 488, "Not Acceptable Here");
+                  session.failed(response, C.causes.BAD_MEDIA_DESCRIPTION);
                 }
               );
           } else {
